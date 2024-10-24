@@ -16,9 +16,6 @@ WORKDIR /app
 # Download the Splunk OTEL agent
 ADD https://github.com/signalfx/splunk-otel-java/releases/latest/download/splunk-otel-javaagent.jar /app/splunk-otel-javaagent.jar
 
-# Download the AppDynamics agent (replace the URL with your actual agent URL)
-ADD https://example.com/path-to-appdynamics-agent.jar /app/appdynamics-agent.jar
-
 # Copy the built application JAR from the build stage
 COPY --from=build /app/build/libs/*.jar /app/myapp.jar
 
@@ -30,7 +27,7 @@ ENTRYPOINT ["/bin/sh", "-c", "\
   if [ \"$AGENT_TYPE\" = 'splunk' ]; then \
     java -javaagent:/app/splunk-otel-javaagent.jar -jar /app/myapp.jar; \
   elif [ \"$AGENT_TYPE\" = 'appdynamics' ]; then \
-    java -javaagent:/app/appdynamics-agent.jar -jar /app/myapp.jar; \
+    java -javaagent:/app/appd-javaagent/javaagent.jar -jar /app/myapp.jar; \
   else \
     java -jar /app/myapp.jar; \
   fi"]
