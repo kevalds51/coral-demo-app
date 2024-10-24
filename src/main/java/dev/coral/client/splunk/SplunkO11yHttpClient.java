@@ -8,10 +8,11 @@ import io.micronaut.http.client.annotation.Client;
 
 @Client("https://api.rc0.signalfx.com") // Base URL
 public interface SplunkO11yHttpClient {
-    @Get(value = "/v2/apm/trace/{traceId}/latest")
-    String getTraceById(@Header("X-SF-Token") String sfxToken, @PathVariable String traceId);
 
-    @Get(value = "/v2/metrictimeseries")
-    String getMts(@Header("X-SF-Token") String sfxToken, @QueryValue String query);
+    @Get(value = "/v2/apm/trace/{traceId}/latest")
+    String getTraceById(@Header("X-SF-Token") String sfxToken, @PathVariable("traceId") String traceId);
+
+    @Get(value = "/v2/metrictimeseries/")
+    String getMts(@Header("X-SF-Token") String sfxToken, @QueryValue("query") String query);
 
 }
