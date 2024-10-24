@@ -1,0 +1,26 @@
+
+micronaut:
+  application:
+    name: coral-demo-app
+  metrics:
+    enabled: true
+    export:
+      signalfx:
+        enabled: true
+        accessToken: ${SIGNALFX_API_TOKEN}
+        step: PT1M
+otel:
+  traces:
+    exporter: logging,otlp
+coral:
+  endpoints:
+    - name: health
+      url: myhealth
+      actions:
+        - "request|http://localhost:8080/health"
+        - "wait_random|1000"
+    - name: info
+      url: myinfo
+      actions:
+        - "request|http://localhost:8080/health"
+        - "wait_random|1000"

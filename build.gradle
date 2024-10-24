@@ -1,0 +1,74 @@
+plugins {
+    id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("io.micronaut.application") version "4.4.2"
+    id("com.google.cloud.tools.jib") version "2.8.0"
+    id("io.micronaut.aot") version "4.4.2"
+}
+
+version = "0.1"
+group = "dev.coral"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    annotationProcessor("org.projectlombok:lombok")
+    annotationProcessor("io.micronaut:micronaut-http-validation")
+    annotationProcessor("io.micronaut.serde:micronaut-serde-processor")
+    implementation("io.micronaut:micronaut-http-client")
+    implementation("io.micronaut:micronaut-management")
+//    implementation("io.micronaut.micrometer:micronaut-micrometer-core")
+//    implementation("io.micronaut.micrometer:micronaut-micrometer-registry-signalfx")
+    implementation("io.micronaut.serde:micronaut-serde-jackson")
+    implementation("io.opentelemetry:opentelemetry-exporter-logging")
+    implementation("io.opentelemetry:opentelemetry-exporter-otlp")
+    compileOnly("org.projectlombok:lombok")
+    runtimeOnly("io.goodforgod:slf4j-simple-logger:2.0.0")
+    runtimeOnly("org.yaml:snakeyaml")
+    implementation("io.micronaut:micronaut-jackson-databind")
+
+}
+
+
+application {
+    mainClass = "dev.coral.Application"
+}
+java {
+    sourceCompatibility = JavaVersion.toVersion("17")
+    targetCompatibility = JavaVersion.toVersion("17")
+}
+
+
+tasks {
+    jib {
+        to {
+            image = "gcr.io/myapp/jib-image"
+        }
+    }
+}
+graalvmNative.toolchainDetection = false
+
+micronaut {
+    runtime("netty")
+    testRuntime("junit5")
+    processing {
+        incremental(true)
+        annotations("dev.coral.*")
+    }
+    aot {
+        // Please review carefully the optimizations enabled below
+        // Check https://micronaut-projects.github.io/micronaut-aot/latest/guide/ for more details
+        optimizeServiceLoading = false
+        convertYamlToJava = false
+        precomputeOperations = true
+        cacheEnvironment = true
+        optimizeClassLoading = true
+        deduceEnvironment = true
+        optimizeNetty = true
+        replaceLogbackXml = true
+    }
+}
+
+
+
