@@ -2,6 +2,7 @@ package dev.coral.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.coral.client.splunk.SplunkO11yHttpClient;
+import dev.coral.utils.metrics.MTSQueryGenerator;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.io.File;
@@ -40,5 +41,9 @@ public class SplunkO11yDataFetcherService {
 
     private Span findExitSpanInTrace(List<Span> trace) {
         return trace.stream().max(Comparator.comparing(Span::getStartTime)).get();
+
+    public String getMTS(String serviceName) {
+        String query = MTSQueryGenerator.generateQueryForService("signalboost");
+        return splunkO11yHttpClient.getMts(SFX_TOKEN, query);
     }
 }

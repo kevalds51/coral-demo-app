@@ -4,14 +4,17 @@ import dev.coral.config.EndpointConfig;
 import dev.coral.service.SplunkO11yDataFetcherService;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.PathVariable;
 import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
 import jakarta.inject.Inject;
 import java.io.IOException;
+import lombok.extern.slf4j.Slf4j;
 import java.util.concurrent.ThreadLocalRandom;
 
+@Slf4j
 @Controller
 @ExecuteOn(TaskExecutors.BLOCKING)
 public class DynamicController {
@@ -38,12 +41,16 @@ public class DynamicController {
     public void getSplunkTraceFromLocal() throws IOException {
         System.out.println("Received Trace for service: " + splunkO11yDataFetcherService.getExistSpanFromLocalTrace());
 
+    @Get("/splunk/metrics/{serviceName}")
+    public void getSplunkMTS(@PathVariable("serviceName") String serviceName) {
+        log.info("Received request to fetch mts for serviceName: {}", serviceName);
+        log.info("Serialized MTS: {} ", splunkO11yDataFetcherService.getMTS(serviceName));
     }
 
     @Get("/{dynamicEndpoint}")
     public String handleRequest(String dynamicEndpoint) {
-        System.out.println("===================================");
-        System.out.println("Dynamic request: " + dynamicEndpoint);
+        log.info("===================================");
+        log.info("Dynamic request: {}", dynamicEndpoint);
         EndpointConfig.Endpoint endpoint = endpointConfig.getEndpoints().stream()
             .filter(e -> e.getUrl().equalsIgnoreCase(dynamicEndpoint))
             .findFirst()
@@ -51,22 +58,21 @@ public class DynamicController {
 
         StringBuilder responseBuilder = new StringBuilder();
         for (String action : endpoint.getActions()) {
-            System.out.println("-----------------------------------");
+            log.info("-----------------------------------");
             String[] parts = action.split("\\|");
             String actionType = parts[0];
             String actionValue = parts[1];
-            System.out.println("Action type: " + actionType + ", Action value: " + actionValue);
+            log.info("Action type: {} , Action value: {}", actionType, actionValue);
             switch (actionType) {
                 case "request":
-                    System.out.println("Making request to: " + actionValue);
+                    log.info("Making request to: {}", actionValue);
                     String response = httpClient.toBlocking().retrieve(actionValue);
                     responseBuilder.append(response);
                     break;
                 case "wait_random":
                     try {
-                        long waitTime =
-                            ThreadLocalRandom.current().nextLong(0, Long.parseLong(actionValue.replace("ms", "")));
-                        System.out.println("Waiting for " + waitTime + "ms");
+                        long waitTime = ThreadLocalRandom.current().nextLong(0, Long.parseLong(actionValue.replace("ms", "")));
+                        log.info("Waiting for {} ms" , waitTime);
                         Thread.sleep(waitTime);
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
@@ -75,7 +81,7 @@ public class DynamicController {
                 // Add more cases for other action types
             }
         }
-        System.out.println("===================================");
+        log.info("===================================");
         return responseBuilder.toString();
     }
 }
