@@ -10,6 +10,8 @@ import io.micronaut.http.client.annotation.Client;
 import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
 import jakarta.inject.Inject;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Controller
@@ -31,7 +33,10 @@ public class DynamicController {
     @Get("/splunk/trace/{traceId}")
     public void getSplunkTrce(String traceId) {
         System.out.println("Received request to fetch traceID: " + traceId);
-        System.out.println("Serialized Trace: " + splunkO11yDataFetcherService.getTrace(traceId));
+        List<Map<String, Object>> traceObject = splunkO11yDataFetcherService.getTrace(traceId);
+        Map<String, Object> latestVersion = traceObject.getFirst();
+        String serviceName = (String) latestVersion.get("serviceName");
+        System.out.println("Received Trace for service: " + serviceName);
     }
 
     @Get("/{dynamicEndpoint}")
