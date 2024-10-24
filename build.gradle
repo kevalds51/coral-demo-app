@@ -24,6 +24,7 @@ dependencies {
     implementation("io.opentelemetry:opentelemetry-exporter-logging")
     implementation("io.opentelemetry:opentelemetry-exporter-otlp")
     compileOnly("org.projectlombok:lombok")
+    implementation("ch.qos.logback:logback-classic:1.4.0")
     runtimeOnly("io.goodforgod:slf4j-simple-logger:2.0.0")
     runtimeOnly("org.yaml:snakeyaml")
     implementation("io.micronaut:micronaut-jackson-databind")
@@ -66,7 +67,7 @@ micronaut {
         optimizeClassLoading = true
         deduceEnvironment = true
         optimizeNetty = true
-        replaceLogbackXml = true
+        replaceLogbackXml = false
     }
 }
 
