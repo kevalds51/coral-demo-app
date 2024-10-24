@@ -1,6 +1,5 @@
 package dev.coral.controllers;
 
-import dev.coral.client.splunk.SplunkO11yHttpClient;
 import dev.coral.config.EndpointConfig;
 import dev.coral.service.SplunkO11yDataFetcherService;
 import io.micronaut.http.annotation.Controller;
@@ -10,8 +9,7 @@ import io.micronaut.http.client.annotation.Client;
 import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
 import jakarta.inject.Inject;
-import java.util.List;
-import java.util.Map;
+import java.io.IOException;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Controller
@@ -30,13 +28,16 @@ public class DynamicController {
         this.splunkO11yDataFetcherService = splunkO11yDataFetcherService;
     }
 
-    @Get("/splunk/trace/{traceId}")
-    public void getSplunkTrce(String traceId) {
+    @Get("/splunk/trace/{traceId}/exitspan")
+    public void getSplunkTrace(String traceId) {
         System.out.println("Received request to fetch traceID: " + traceId);
-        List<Map<String, Object>> traceObject = splunkO11yDataFetcherService.getTrace(traceId);
-        Map<String, Object> latestVersion = traceObject.getFirst();
-        String serviceName = (String) latestVersion.get("serviceName");
-        System.out.println("Received Trace for service: " + serviceName);
+        System.out.println("Received Trace for service: " + splunkO11yDataFetcherService.getExistSpanFromTraceAPI(traceId));
+    }
+
+    @Get("/splunk/trace/local/exitspan")
+    public void getSplunkTraceFromLocal() throws IOException {
+        System.out.println("Received Trace for service: " + splunkO11yDataFetcherService.getExistSpanFromLocalTrace());
+
     }
 
     @Get("/{dynamicEndpoint}")
@@ -44,9 +45,9 @@ public class DynamicController {
         System.out.println("===================================");
         System.out.println("Dynamic request: " + dynamicEndpoint);
         EndpointConfig.Endpoint endpoint = endpointConfig.getEndpoints().stream()
-                .filter(e -> e.getUrl().equalsIgnoreCase(dynamicEndpoint))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Endpoint not found"));
+            .filter(e -> e.getUrl().equalsIgnoreCase(dynamicEndpoint))
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException("Endpoint not found"));
 
         StringBuilder responseBuilder = new StringBuilder();
         for (String action : endpoint.getActions()) {
@@ -63,7 +64,8 @@ public class DynamicController {
                     break;
                 case "wait_random":
                     try {
-                        long waitTime = ThreadLocalRandom.current().nextLong(0, Long.parseLong(actionValue.replace("ms", "")));
+                        long waitTime =
+                            ThreadLocalRandom.current().nextLong(0, Long.parseLong(actionValue.replace("ms", "")));
                         System.out.println("Waiting for " + waitTime + "ms");
                         Thread.sleep(waitTime);
                     } catch (InterruptedException e) {
