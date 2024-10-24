@@ -3,6 +3,8 @@ package dev.coral.service;
 import dev.coral.client.splunk.SplunkO11yHttpClient;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import java.util.List;
+import java.util.Map;
 
 @Singleton
 public class SplunkO11yDataFetcherService {
@@ -16,7 +18,7 @@ public class SplunkO11yDataFetcherService {
         this.SFX_TOKEN = System.getenv("SIGNALFX_API_TOKEN");
     }
 
-    public String getTrace(String traceID) {
+    public List<Map<String, Object>> getTrace(String traceID) {
         return splunkO11yHttpClient.getTraceById(SFX_TOKEN, traceID);
     }
 }
