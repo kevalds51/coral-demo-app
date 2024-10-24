@@ -2,6 +2,10 @@
 micronaut:
   application:
     name: coral-demo-app
+  http:
+    client:
+      read-timeout: 30000 # milliseconds
+      connect-timeout: 30000 # milliseconds
   metrics:
     enabled: true
     export:

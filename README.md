@@ -1,6 +1,10 @@
 Demo App
 
-Configure the endpoints and actions dynamically in the app.
+### Access Tokens
+Set `SIGNALFX_API_TOKEN` variable in your IntelliJ run configuration under env variables
+
+### Test endpoints
+GET http://localhost:8080/splunk/trace/{{traceId}}}
     
 ```yaml
 coral:

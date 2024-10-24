@@ -1,6 +1,8 @@
 package dev.coral.controllers;
 
+import dev.coral.client.splunk.SplunkO11yHttpClient;
 import dev.coral.config.EndpointConfig;
+import dev.coral.service.SplunkO11yDataFetcherService;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.client.HttpClient;
@@ -16,11 +18,20 @@ public class DynamicController {
 
     private final EndpointConfig endpointConfig;
     private final HttpClient httpClient;
+    private final SplunkO11yDataFetcherService splunkO11yDataFetcherService;
 
     @Inject
-    public DynamicController(EndpointConfig endpointConfig, @Client HttpClient httpClient) {
+    public DynamicController(EndpointConfig endpointConfig, @Client HttpClient httpClient,
+                             SplunkO11yDataFetcherService splunkO11yDataFetcherService) {
         this.endpointConfig = endpointConfig;
         this.httpClient = httpClient;
+        this.splunkO11yDataFetcherService = splunkO11yDataFetcherService;
+    }
+
+    @Get("/splunk/trace/{traceId}")
+    public void getSplunkTrce(String traceId) {
+        System.out.println("Received request to fetch traceID: " + traceId);
+        System.out.println("Serialized Trace: " + splunkO11yDataFetcherService.getTrace(traceId));
     }
 
     @Get("/{dynamicEndpoint}")
