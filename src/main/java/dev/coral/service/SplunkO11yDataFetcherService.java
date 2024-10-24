@@ -1,6 +1,7 @@
 package dev.coral.service;
 
 import dev.coral.client.splunk.SplunkO11yHttpClient;
+import dev.coral.utils.metrics.MTSQueryGenerator;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
@@ -18,5 +19,10 @@ public class SplunkO11yDataFetcherService {
 
     public String getTrace(String traceID) {
         return splunkO11yHttpClient.getTraceById(SFX_TOKEN, traceID);
+    }
+
+    public String getMTS(String serviceName) {
+        String query = MTSQueryGenerator.generateQueryForService("signalboost");
+        return splunkO11yHttpClient.getMts(SFX_TOKEN, query);
     }
 }
