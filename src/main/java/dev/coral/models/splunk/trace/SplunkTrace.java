@@ -27,7 +27,7 @@ class Log {
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Trace {
+class Trace {
     private String traceId;
     private String spanId;
     private Object parentId;
@@ -37,7 +37,7 @@ public class Trace {
     private Integer durationMicros;
     private Map<String, String> tags;
     private Map<String, String> processTags;
-    private List<Log> logs = new ArrayList<Log>();
+    private List<Log> logs = new ArrayList<>();
     private String splunk;
     private String objectType;
 }
