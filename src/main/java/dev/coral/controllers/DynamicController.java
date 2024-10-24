@@ -34,6 +34,12 @@ public class DynamicController {
         System.out.println("Serialized Trace: " + splunkO11yDataFetcherService.getTrace(traceId));
     }
 
+    @Get("/splunk/metrics/{service}")
+    public void getSplunkMTS(String service) {
+        System.out.println("Received request to fetch traceID: " + service);
+        System.out.println("Serialized Trace: " + splunkO11yDataFetcherService.getMTS(service));
+    }
+
     @Get("/{dynamicEndpoint}")
     public String handleRequest(String dynamicEndpoint) {
         System.out.println("===================================");
